@@ -3956,52 +3956,76 @@
     }
   ];
 
-  // === COVER-LOADER: Echte Cover via iTunes Search API ===
+  // === COVER-LOADER: Mehrstufige Suche ===
+  // 1. MusicBrainz + Cover Art Archive (echte CORS-Unterstützung, beste Vinyl-Treffer)
+  // 2. iTunes als Fallback (JSONP, manchmal unzuverlässig)
+
   const coverCache = new Map();
   const coverPromises = new Map();
 
-  // Manche Suchen brauchen Hilfe, damit iTunes das richtige Album findet
+  // Manche Suchen brauchen Hilfe
   const coverSearchOverrides = {
     "Coltrane|Giant Steps": "John Coltrane Giant Steps",
     "Lynyrd Skynyrd|Pronounced": "Lynyrd Skynyrd Pronounced Leh-Nerd Skin-Nerd",
     "The Allman Brothers|At Fillmore East": "Allman Brothers At Fillmore East",
     "The Four Tops|Reach Out": "Four Tops Reach Out I'll Be There",
     "Donna Summer|I Feel Love": "Donna Summer I Remember Yesterday",
-    "King Tubby|Dub from the Roots": "King Tubby Dub from the Roots",
     "Howlin' Wolf|Moanin' in the Moonlight": "Howlin Wolf Moanin in the Moonlight",
     "Robert Johnson|King of the Delta Blues": "Robert Johnson King of the Delta Blues Singers",
     "Led Zeppelin|IV": "Led Zeppelin IV Untitled",
-    "Neu!|Neu!": "Neu 1972",
-    "Yes|Close to the Edge": "Yes Close to the Edge",
-    "Coltrane|Giant Steps": "John Coltrane Giant Steps",
-    "Pink Floyd|The Dark Side of the Moon": "Pink Floyd Dark Side of the Moon"
+    "Neu!|Neu!": "Neu 1972"
   };
 
   function getCoverKey(record) {
     return `${record.artist}|${record.title}`;
   }
 
-  function getSearchQuery(record) {
-    const key = getCoverKey(record);
-    return coverSearchOverrides[key] || `${record.artist} ${record.title}`;
+  // === QUELLE 1: MusicBrainz + Cover Art Archive ===
+  // MusicBrainz hat echte CORS-Header — funktioniert direkt mit fetch()
+  async function tryMusicBrainz(record) {
+    try {
+      // Suche Release-Group
+      const query = `release-group:"${record.title}" AND artist:"${record.artist}"`;
+      const mbUrl = `https://musicbrainz.org/ws/2/release-group/?query=${encodeURIComponent(query)}&limit=3&fmt=json`;
+
+      const r = await fetch(mbUrl, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!r.ok) return null;
+
+      const data = await r.json();
+      const groups = data['release-groups'] || [];
+      if (!groups.length) return null;
+
+      // Versuche Cover für die ersten paar Release-Groups
+      for (const group of groups.slice(0, 3)) {
+        try {
+          const coverUrl = `https://coverartarchive.org/release-group/${group.id}/front-500`;
+          // HEAD-Request, um zu prüfen ob Cover existiert
+          const head = await fetch(coverUrl, { method: 'HEAD' });
+          if (head.ok) {
+            return coverUrl;
+          }
+        } catch (e) { /* nächste Gruppe versuchen */ }
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
-  // Lädt Cover via iTunes (JSONP, weil iTunes Cors nicht erlaubt)
-  function loadCoverForRecord(record) {
+  // === QUELLE 2: iTunes (JSONP-Fallback) ===
+  function tryItunes(record) {
     const key = getCoverKey(record);
-    if (coverCache.has(key)) return Promise.resolve(coverCache.get(key));
-    if (coverPromises.has(key)) return coverPromises.get(key);
-
-    const query = getSearchQuery(record);
-    const callbackName = `itunesCallback_${Math.random().toString(36).slice(2)}`;
+    const query = coverSearchOverrides[key] || `${record.artist} ${record.title}`;
+    const callbackName = `itunesCb_${Math.random().toString(36).slice(2)}`;
     const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=1&callback=${callbackName}`;
 
-    const promise = new Promise((resolve) => {
+    return new Promise((resolve) => {
       const timeoutId = setTimeout(() => {
         cleanup();
-        coverCache.set(key, null);
         resolve(null);
-      }, 8000);
+      }, 5000);
 
       function cleanup() {
         delete window[callbackName];
@@ -4013,10 +4037,8 @@
         cleanup();
         let coverUrl = null;
         if (data && data.resultCount > 0 && data.results[0].artworkUrl100) {
-          // High-res: ersetze 100x100 durch 600x600
           coverUrl = data.results[0].artworkUrl100.replace('100x100', '600x600');
         }
-        coverCache.set(key, coverUrl);
         resolve(coverUrl);
       };
 
@@ -4025,17 +4047,36 @@
       script.onerror = () => {
         clearTimeout(timeoutId);
         cleanup();
-        coverCache.set(key, null);
         resolve(null);
       };
       document.head.appendChild(script);
     });
+  }
+
+  // === HAUPT-LOADER: Quellen kaskadieren ===
+  function loadCoverForRecord(record) {
+    const key = getCoverKey(record);
+    if (coverCache.has(key)) return Promise.resolve(coverCache.get(key));
+    if (coverPromises.has(key)) return coverPromises.get(key);
+
+    const promise = (async () => {
+      // Quelle 1: MusicBrainz / Cover Art Archive
+      let url = await tryMusicBrainz(record);
+
+      // Quelle 2: iTunes als Fallback
+      if (!url) {
+        url = await tryItunes(record);
+      }
+
+      coverCache.set(key, url);
+      return url;
+    })();
 
     coverPromises.set(key, promise);
     return promise;
   }
 
-  // Cover laden und an die DOM-Karte anhängen
+  // Cover-Bild an Karte anhängen mit IntersectionObserver für lazy loading
   function attachCoverToCard(record, cardEl) {
     const coverContainer = cardEl.querySelector('.record-cover');
     if (!coverContainer || coverContainer.querySelector('.real-cover')) return;
