@@ -1332,6 +1332,837 @@
     border-radius: 2px;
   }
 
+
+  /* ============================================
+     ERFASSUNGS-MODULE
+     ============================================ */
+  .capture-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .capture-card {
+    background: var(--paper);
+    border: 1px solid var(--cream-dark);
+    border-radius: 4px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .capture-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px var(--shadow);
+    border-color: var(--rust);
+  }
+
+  .capture-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--accent, var(--rust));
+  }
+
+  .capture-card.green { --accent: var(--olive); }
+  .capture-card.yellow { --accent: var(--mustard); }
+  .capture-card.brown { --accent: var(--wood); }
+  .capture-card.dark { --accent: var(--wood-light); }
+
+  .capture-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--accent, var(--rust));
+    color: var(--cream);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .capture-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    font-style: italic;
+    color: var(--wood);
+    margin-bottom: 0.35rem;
+  }
+
+  .capture-desc {
+    font-size: 0.88rem;
+    color: var(--olive);
+    line-height: 1.4;
+    font-style: italic;
+    flex: 1;
+  }
+
+  .capture-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: var(--mustard);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 100px;
+    font-weight: 700;
+  }
+
+  /* Capture-Modal */
+  .capture-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 20, 16, 0.92);
+    z-index: 200;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .capture-modal.active { display: flex; }
+
+  .capture-stage {
+    background: var(--paper);
+    border-radius: 4px;
+    max-width: 640px;
+    width: 100%;
+    margin: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+    animation: modalIn 0.3s ease;
+  }
+
+  .capture-modal-header {
+    padding: 1.25rem 1.5rem;
+    background: var(--wood);
+    color: var(--cream);
+    border-bottom: 3px solid var(--rust);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .capture-modal-icon {
+    font-size: 1.5rem;
+    color: var(--mustard);
+  }
+
+  .capture-modal-title {
+    flex: 1;
+    font-size: 1.2rem;
+    font-weight: 800;
+    font-style: italic;
+  }
+
+  .capture-modal-close {
+    background: rgba(244, 234, 213, 0.2);
+    border: none;
+    color: var(--cream);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  .capture-modal-body { padding: 1.5rem; }
+
+  /* Foto-Bereich */
+  .photo-stage {
+    aspect-ratio: 1;
+    background: var(--ink);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 50vh;
+  }
+
+  .photo-stage img,
+  .photo-stage video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-empty {
+    color: var(--cream);
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .photo-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.45;
+  }
+
+  .photo-empty-text {
+    font-style: italic;
+    opacity: 0.7;
+    font-size: 0.95rem;
+  }
+
+  /* Scanner-Frame */
+  .scanner-frame {
+    position: absolute;
+    inset: 10%;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .scanner-frame::before,
+  .scanner-frame::after {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-color: var(--mustard);
+    border-style: solid;
+  }
+
+  .scanner-frame::before {
+    top: 0;
+    left: 0;
+    border-width: 3px 0 0 3px;
+  }
+
+  .scanner-frame::after {
+    bottom: 0;
+    right: 0;
+    border-width: 0 3px 3px 0;
+  }
+
+  .scanner-frame .corner-tr,
+  .scanner-frame .corner-bl {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-color: var(--mustard);
+    border-style: solid;
+  }
+
+  .scanner-frame .corner-tr {
+    top: 0;
+    right: 0;
+    border-width: 3px 3px 0 0;
+  }
+
+  .scanner-frame .corner-bl {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 3px 3px;
+  }
+
+  .scanner-line {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--mustard), transparent);
+    box-shadow: 0 0 12px var(--mustard);
+    animation: scannerSweep 2s ease-in-out infinite;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  @keyframes scannerSweep {
+    0% { top: 8%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 92%; opacity: 0; }
+  }
+
+  /* Capture-Buttons */
+  .capture-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .capture-btn {
+    padding: 0.95rem 1.6rem;
+    border: none;
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .capture-btn-primary {
+    background: var(--rust);
+    color: var(--cream);
+  }
+
+  .capture-btn-primary:hover { background: var(--rust-dark); }
+
+  .capture-btn-secondary {
+    background: transparent;
+    color: var(--wood);
+    border: 1.5px solid var(--wood);
+  }
+
+  .capture-btn-secondary:hover { background: var(--cream); }
+
+  .capture-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Status-Box */
+  .recog-status {
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--wood);
+  }
+
+  .recog-status.recognizing {
+    border-color: var(--mustard);
+    background: linear-gradient(90deg, rgba(212, 162, 58, 0.12), rgba(179, 74, 44, 0.05));
+  }
+
+  .recog-status.success {
+    border-color: var(--olive);
+    background: rgba(107, 98, 51, 0.08);
+  }
+
+  .recog-status.error {
+    border-color: var(--rust);
+    background: rgba(179, 74, 44, 0.08);
+  }
+
+  .recog-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--cream-dark);
+    border-top-color: var(--rust);
+    border-radius: 50%;
+    animation: rspin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes rspin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Erkennungs-Ergebnis */
+  .recog-result {
+    background: var(--paper);
+    border: 2px solid var(--olive);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .recog-result-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--olive);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .recog-result-label::before {
+    content: '✓';
+    font-size: 1rem;
+  }
+
+  .recog-result-artist {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--rust);
+    margin-bottom: 0.3rem;
+  }
+
+  .recog-result-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    font-style: italic;
+    color: var(--wood);
+    margin-bottom: 0.3rem;
+  }
+
+  .recog-result-meta {
+    font-size: 0.9rem;
+    color: var(--olive);
+    margin-bottom: 0.5rem;
+  }
+
+  .recog-confidence {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    background: var(--cream);
+    padding: 0.2rem 0.55rem;
+    border-radius: 100px;
+    color: var(--olive);
+  }
+
+  .duplicate-warn {
+    margin-top: 0.85rem;
+    padding: 0.75rem 1rem;
+    background: rgba(212, 162, 58, 0.18);
+    border-left: 3px solid var(--mustard);
+    border-radius: 2px;
+    font-size: 0.9rem;
+    color: var(--wood);
+  }
+
+  .duplicate-warn strong {
+    color: var(--rust-dark);
+    font-style: italic;
+  }
+
+  /* Mini-Form für Position */
+  .quick-form {
+    margin-top: 1rem;
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+  }
+
+  .quick-form-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--olive);
+    margin-bottom: 0.4rem;
+  }
+
+  .quick-form input {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    border: 1.5px solid var(--cream-dark);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .quick-form input:focus { border-color: var(--rust); }
+
+  /* Stapel-Modus Liste */
+  .batch-list {
+    margin-top: 1rem;
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--cream-dark);
+    border-radius: 4px;
+    background: var(--cream);
+  }
+
+  .batch-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--olive);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  .batch-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px dashed var(--cream-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    animation: batchIn 0.3s ease;
+  }
+
+  @keyframes batchIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .batch-item:last-child { border-bottom: none; }
+
+  .batch-item-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 100px;
+    flex-shrink: 0;
+    font-weight: 700;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  .batch-item-status.ok {
+    background: var(--olive);
+    color: var(--cream);
+  }
+
+  .batch-item-status.dup {
+    background: var(--mustard);
+    color: var(--ink);
+  }
+
+  .batch-item-status.fail {
+    background: var(--rust);
+    color: var(--cream);
+  }
+
+  .batch-item-text { flex: 1; color: var(--wood); }
+  .batch-item-text strong { font-weight: 600; }
+
+  .batch-summary {
+    margin-top: 1rem;
+    padding: 0.85rem 1.1rem;
+    background: rgba(107, 98, 51, 0.08);
+    border-left: 3px solid var(--olive);
+    border-radius: 2px;
+    font-size: 0.92rem;
+    color: var(--wood);
+  }
+
+  /* Sprach-Modus */
+  .mic-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 1rem 0.5rem;
+  }
+
+  .mic-button {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--rust);
+    border: none;
+    color: var(--cream);
+    font-size: 2.6rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 8px 24px rgba(179, 74, 44, 0.4);
+    position: relative;
+  }
+
+  .mic-button:hover { transform: scale(1.05); }
+
+  .mic-button.listening {
+    background: var(--rust-dark);
+    animation: micPulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes micPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(179, 74, 44, 0.6),
+                  0 8px 24px rgba(179, 74, 44, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 30px rgba(179, 74, 44, 0),
+                  0 8px 24px rgba(179, 74, 44, 0.4);
+    }
+  }
+
+  .mic-status {
+    text-align: center;
+    color: var(--olive);
+    font-style: italic;
+    margin-bottom: 1rem;
+    min-height: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .mic-transcript {
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    min-height: 60px;
+    width: 100%;
+    color: var(--wood);
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .mic-transcript:empty::before {
+    content: 'Hier erscheint, was du sagst...';
+    color: var(--olive);
+    opacity: 0.5;
+  }
+
+  .mic-hints {
+    background: var(--cream);
+    border-left: 3px solid var(--mustard);
+    border-radius: 2px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.85rem;
+    color: var(--wood);
+    line-height: 1.5;
+  }
+
+  .mic-hints strong {
+    font-weight: 600;
+    color: var(--rust-dark);
+  }
+
+  .mic-hints code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--paper);
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+    font-size: 0.85em;
+    color: var(--rust-dark);
+  }
+
+  /* Discogs Suche */
+  .discogs-search {
+    position: relative;
+  }
+
+  .discogs-input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    border: 2px solid var(--wood);
+    background: var(--cream);
+    color: var(--ink);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .discogs-input:focus {
+    border-color: var(--rust);
+    box-shadow: 0 0 0 3px rgba(179, 74, 44, 0.15);
+  }
+
+  .discogs-results {
+    margin-top: 1rem;
+    border: 1px solid var(--cream-dark);
+    border-radius: 4px;
+    background: var(--cream);
+    max-height: 380px;
+    overflow-y: auto;
+  }
+
+  .discogs-result-item {
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    border-bottom: 1px dashed var(--cream-dark);
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .discogs-result-item:hover {
+    background: var(--cream-dark);
+  }
+
+  .discogs-result-item:last-child { border-bottom: none; }
+
+  .discogs-result-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 2px;
+    background: var(--wood);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .discogs-result-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .discogs-result-info { flex: 1; min-width: 0; }
+
+  .discogs-result-artist {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--rust);
+    margin-bottom: 0.15rem;
+  }
+
+  .discogs-result-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--wood);
+    line-height: 1.2;
+    margin-bottom: 0.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .discogs-result-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--olive);
+  }
+
+  .discogs-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--olive);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  /* Stapel: Foto-Galerie */
+  .batch-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .batch-thumb {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    background: var(--ink);
+  }
+
+  .batch-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .batch-thumb-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: var(--olive);
+    color: var(--cream);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 100px;
+  }
+
+  .batch-thumb-badge.fail { background: var(--rust); }
+  .batch-thumb-badge.dup { background: var(--mustard); color: var(--ink); }
+
+  /* Capture-Section: Toolbar oben */
+  .capture-toolbar {
+    background: var(--paper);
+    border: 1px solid var(--cream-dark);
+    border-radius: 4px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .capture-toolbar-info { flex: 1; min-width: 200px; }
+
+  .capture-toolbar-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--wood);
+    margin-bottom: 0.2rem;
+  }
+
+  .capture-toolbar-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--olive);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .capture-mode-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.3rem 0.7rem;
+    border-radius: 100px;
+    background: var(--mustard);
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* Manuell-Form bleibt erhalten */
+  .manual-toggle {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .manual-toggle-link {
+    background: none;
+    border: none;
+    color: var(--rust);
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-style: italic;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--mustard);
+    text-underline-offset: 4px;
+  }
+
+  .manual-toggle-link:hover { color: var(--rust-dark); }
+
+  .manual-form-wrap {
+    display: none;
+    margin-top: 1.5rem;
+  }
+
+  .manual-form-wrap.show { display: block; }
+
+
   /* Modal */
   .modal-backdrop {
     display: none;
@@ -1842,64 +2673,280 @@
 
   <section class="view" id="view-add">
     <div class="search-hero">
-      <h1 class="search-title">Neue Platte erfassen</h1>
-      <p class="search-subtitle">Trag die wichtigsten Daten ein — Cover-Foto kommt später.</p>
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Künstler / Band</label>
-          <input class="form-input" placeholder="z. B. Led Zeppelin">
+      <h1 class="search-title">Platte erfassen</h1>
+      <p class="search-subtitle">Wähle, wie du sie in die Kiste legen willst — fotografieren, scannen, sprechen oder suchen.</p>
+
+      <div class="capture-toolbar">
+        <div class="capture-toolbar-info">
+          <div class="capture-toolbar-title">Demo-Modus aktiv</div>
+          <div class="capture-toolbar-sub">Erkennung läuft simuliert · 100% offline</div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Album-Titel</label>
-          <input class="form-input" placeholder="z. B. Physical Graffiti">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Jahr</label>
-          <input class="form-input" type="number" placeholder="1975">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Label & Katalog-Nr.</label>
-          <input class="form-input" placeholder="z. B. Swan Song SSK 89400">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Matrix-Code (Runout)</label>
-          <input class="form-input" placeholder="z. B. SHVL 804 A-2">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Pressing-Plant</label>
-          <input class="form-input" placeholder="z. B. EMI Hayes, Pallas, MPO">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Genre</label>
-          <select class="form-select" id="addGenreSelect"></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Zustand (Goldmine)</label>
-          <select class="form-select">
-            <option>Mint (M)</option><option>Near Mint (NM)</option>
-            <option>Very Good Plus (VG+)</option><option>Very Good (VG)</option>
-            <option>Good (G)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Schrank-Position</label>
-          <input class="form-input" placeholder="z. B. Regal 3, Fach B">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Pressing-Land</label>
-          <input class="form-input" placeholder="Deutschland, UK, USA, JP…">
-        </div>
-        <div class="form-group full">
-          <label class="form-label">Persönliche Notiz</label>
-          <textarea class="form-textarea" placeholder="Wo gekauft, besondere Erinnerung, Lieblings-Track…"></textarea>
-        </div>
+        <span class="capture-mode-badge">★ Demo</span>
       </div>
-      <div class="form-actions">
-        <button class="btn-secondary">Abbrechen</button>
-        <button class="search-btn">In die Kiste legen</button>
+
+      <div class="capture-grid">
+        <button class="capture-card" onclick="openCapture('photo')">
+          <span class="capture-badge">★ Empfohlen</span>
+          <div class="capture-icon">📷</div>
+          <div class="capture-title">Cover fotografieren</div>
+          <div class="capture-desc">Plattenhülle vor die Kamera halten — Künstler, Album und Jahr werden erkannt.</div>
+        </button>
+
+        <button class="capture-card green" onclick="openCapture('batch')">
+          <div class="capture-icon">📚</div>
+          <div class="capture-title">Stapel-Foto</div>
+          <div class="capture-desc">Mehrere Cover auf einmal fotografieren — perfekt für die Massenerfassung.</div>
+        </button>
+
+        <button class="capture-card yellow" onclick="openCapture('matrix')">
+          <div class="capture-icon">🔍</div>
+          <div class="capture-title">Matrix-Code lesen</div>
+          <div class="capture-desc">Auslauf-Rille fotografieren — Pressing wird identifiziert. Für Kenner.</div>
+        </button>
+
+        <button class="capture-card brown" onclick="openCapture('voice')">
+          <div class="capture-icon">🎙️</div>
+          <div class="capture-title">Sprechen</div>
+          <div class="capture-desc">„Pink Floyd, Wish You Were Here, Fach 3B" — diktieren, fertig.</div>
+        </button>
+
+        <button class="capture-card dark" onclick="openCapture('discogs')">
+          <div class="capture-icon">💿</div>
+          <div class="capture-title">Discogs-Suche</div>
+          <div class="capture-desc">Größte Vinyl-Datenbank der Welt — mit Pressings, Labels, Matrix-Codes.</div>
+        </button>
+
+        <button class="capture-card" onclick="toggleManualForm()" style="--accent: var(--rust-dark);">
+          <div class="capture-icon" style="background: var(--rust-dark);">✍️</div>
+          <div class="capture-title">Manuell tippen</div>
+          <div class="capture-desc">Klassisch — alle Felder selbst ausfüllen. Für seltene Pressungen.</div>
+        </button>
+      </div>
+
+      <div class="manual-form-wrap" id="manualFormWrap">
+        <h2 style="font-size: 1.5rem; font-weight: 800; font-style: italic; color: var(--wood); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--wood);">Manuell erfassen</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Künstler / Band</label>
+            <input class="form-input" id="m_artist" placeholder="z. B. Led Zeppelin">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Album-Titel</label>
+            <input class="form-input" id="m_title" placeholder="z. B. Physical Graffiti">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jahr</label>
+            <input class="form-input" id="m_year" type="number" placeholder="1975">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Label & Katalog-Nr.</label>
+            <input class="form-input" id="m_label" placeholder="z. B. Swan Song SSK 89400">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Matrix-Code (Runout)</label>
+            <input class="form-input" id="m_matrix" placeholder="z. B. SHVL 804 A-2">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pressing-Plant</label>
+            <input class="form-input" id="m_plant" placeholder="z. B. EMI Hayes, Pallas, MPO">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Genre</label>
+            <select class="form-select" id="addGenreSelect"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zustand (Goldmine)</label>
+            <select class="form-select" id="m_condition">
+              <option>Mint (M)</option><option>Near Mint (NM)</option>
+              <option>Very Good Plus (VG+)</option><option>Very Good (VG)</option>
+              <option>Good (G)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Schrank-Position</label>
+            <input class="form-input" id="m_position" placeholder="z. B. Regal 3, Fach B">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pressing-Land</label>
+            <input class="form-input" id="m_country" placeholder="Deutschland, UK, USA, JP…">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Persönliche Notiz</label>
+            <textarea class="form-textarea" id="m_note" placeholder="Wo gekauft, besondere Erinnerung, Lieblings-Track…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-secondary" onclick="toggleManualForm()">Abbrechen</button>
+          <button class="search-btn" onclick="saveManualRecord()">In die Kiste legen</button>
+        </div>
       </div>
     </div>
   </section>
+
+  <!-- ================ CAPTURE MODALS ================ -->
+
+  <!-- 1. Foto-Erkennung -->
+  <div class="capture-modal" id="modal-photo">
+    <div class="capture-stage">
+      <div class="capture-modal-header">
+        <span class="capture-modal-icon">📷</span>
+        <span class="capture-modal-title">Cover fotografieren</span>
+        <button class="capture-modal-close" onclick="closeCapture('photo')">×</button>
+      </div>
+      <div class="capture-modal-body">
+        <div class="photo-stage" id="photo-stage">
+          <div class="photo-empty">
+            <div class="photo-empty-icon">🎵</div>
+            <div class="photo-empty-text">Plattenhülle vor die Kamera halten</div>
+          </div>
+          <div class="scanner-frame" style="display:none;" id="photo-frame">
+            <div class="corner-tr"></div>
+            <div class="corner-bl"></div>
+          </div>
+        </div>
+        <div id="photo-result-box"></div>
+        <div class="capture-actions" id="photo-actions">
+          <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoCapture(event)">
+          <button class="capture-btn capture-btn-primary" onclick="document.getElementById('photo-input').click()">
+            📷 Foto aufnehmen
+          </button>
+          <button class="capture-btn capture-btn-secondary" onclick="simulateDemoPhoto()">
+            ✨ Demo-Erkennung
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Stapel-Foto -->
+  <div class="capture-modal" id="modal-batch">
+    <div class="capture-stage">
+      <div class="capture-modal-header">
+        <span class="capture-modal-icon">📚</span>
+        <span class="capture-modal-title">Stapel-Erfassung</span>
+        <button class="capture-modal-close" onclick="closeCapture('batch')">×</button>
+      </div>
+      <div class="capture-modal-body">
+        <div class="recog-status" style="background: rgba(212, 162, 58, 0.1); border-color: rgba(212, 162, 58, 0.3);">
+          <span style="font-size: 1.5rem;">💡</span>
+          <span>Mehrere Cover gleichzeitig fotografieren — die KI erkennt jedes einzeln und legt sie alle in die Kiste.</span>
+        </div>
+
+        <div class="batch-gallery" id="batch-gallery"></div>
+
+        <div id="batch-status-box"></div>
+        <div class="batch-list" id="batch-list">
+          <div class="batch-empty">Noch keine Platten erkannt — oben „Stapel fotografieren" tippen</div>
+        </div>
+
+        <div id="batch-summary-box"></div>
+
+        <div class="capture-actions" style="margin-top: 1.25rem;">
+          <input type="file" id="batch-input" accept="image/*" capture="environment" multiple style="display:none;" onchange="handleBatchCapture(event)">
+          <button class="capture-btn capture-btn-primary" onclick="document.getElementById('batch-input').click()">
+            📚 Stapel fotografieren
+          </button>
+          <button class="capture-btn capture-btn-secondary" onclick="simulateDemoBatch()">
+            ✨ Demo-Stapel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Matrix-Code -->
+  <div class="capture-modal" id="modal-matrix">
+    <div class="capture-stage">
+      <div class="capture-modal-header">
+        <span class="capture-modal-icon">🔍</span>
+        <span class="capture-modal-title">Matrix-Code lesen</span>
+        <button class="capture-modal-close" onclick="closeCapture('matrix')">×</button>
+      </div>
+      <div class="capture-modal-body">
+        <div class="recog-status" style="background: rgba(212, 162, 58, 0.1); border-color: rgba(212, 162, 58, 0.3);">
+          <span style="font-size: 1.4rem;">💎</span>
+          <span><strong>Kenner-Modus:</strong> Halte die Auslauf-Rille der Platte zur Kamera. Die KI liest den eingravierten Matrix-Code und identifiziert die exakte Pressung.</span>
+        </div>
+
+        <div class="photo-stage" id="matrix-stage">
+          <div class="photo-empty">
+            <div class="photo-empty-icon">🔍</div>
+            <div class="photo-empty-text">Auslauf-Rille zur Kamera halten</div>
+          </div>
+          <div class="scanner-frame" style="display:none;" id="matrix-frame">
+            <div class="corner-tr"></div>
+            <div class="corner-bl"></div>
+          </div>
+        </div>
+
+        <div id="matrix-result-box"></div>
+
+        <div class="capture-actions">
+          <input type="file" id="matrix-input" accept="image/*" capture="environment" style="display:none;" onchange="handleMatrixCapture(event)">
+          <button class="capture-btn capture-btn-primary" onclick="document.getElementById('matrix-input').click()">
+            🔍 Runout fotografieren
+          </button>
+          <button class="capture-btn capture-btn-secondary" onclick="simulateDemoMatrix()">
+            ✨ Demo-Erkennung
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Sprache -->
+  <div class="capture-modal" id="modal-voice">
+    <div class="capture-stage">
+      <div class="capture-modal-header">
+        <span class="capture-modal-icon">🎙️</span>
+        <span class="capture-modal-title">Diktat</span>
+        <button class="capture-modal-close" onclick="closeCapture('voice')">×</button>
+      </div>
+      <div class="capture-modal-body">
+        <div class="mic-stage">
+          <button class="mic-button" id="mic-button" onclick="toggleVoiceCapture()">🎙️</button>
+          <div class="mic-status" id="mic-status">Tippe auf das Mikro und sprich</div>
+          <div class="mic-transcript" id="mic-transcript"></div>
+        </div>
+
+        <div id="voice-result-box"></div>
+
+        <div class="mic-hints">
+          <strong>So sprichst du mit der App:</strong><br>
+          • <code>"Pink Floyd, Dark Side of the Moon, Fach 3B"</code><br>
+          • <code>"Led Zeppelin Vier, Erstpressung, sehr gut"</code><br>
+          • <code>"Joni Mitchell Blue, Regal 7"</code><br>
+          <span style="display:inline-block; margin-top:0.5rem; opacity:0.7;">Künstler und Album zuerst, dann Position oder Zustand.</span>
+        </div>
+
+        <div class="capture-actions" style="margin-top: 1rem;">
+          <button class="capture-btn capture-btn-secondary" onclick="simulateDemoVoice()">
+            ✨ Demo-Diktat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Discogs-Suche -->
+  <div class="capture-modal" id="modal-discogs">
+    <div class="capture-stage">
+      <div class="capture-modal-header">
+        <span class="capture-modal-icon">💿</span>
+        <span class="capture-modal-title">Discogs-Suche</span>
+        <button class="capture-modal-close" onclick="closeCapture('discogs')">×</button>
+      </div>
+      <div class="capture-modal-body">
+        <div class="discogs-search">
+          <input type="text" class="discogs-input" id="discogs-input" placeholder="Künstler, Album, Label oder Katalog-Nr.…" autocomplete="off">
+        </div>
+        <div class="discogs-results" id="discogs-results">
+          <div class="discogs-empty">Tippe oben einen Suchbegriff ein</div>
+        </div>
+        <div id="discogs-result-box"></div>
+      </div>
+    </div>
+  </div>
 
   <section class="view" id="view-wishlist">
     <div class="search-hero">
@@ -3176,6 +4223,955 @@
         </div>
       </div>
     `).join('');
+  }
+
+
+  // ============================================
+  // ERFASSUNGS-LOGIK (Demo-Modus)
+  // ============================================
+
+  // Demo-Erkennungs-Pool: glaubwürdige "Treffer" für die Foto-Demo
+  const demoPhotoPool = [
+    { artist: "Genesis", title: "Selling England by the Pound", year: 1973, genre: "prog-rock", label: "Charisma", catalog: "CAS 1074", country: "UK", confidence: 0.96, notes: "Letzte Phase mit Peter Gabriel, Mellotron-Klangwand." },
+    { artist: "Steely Dan", title: "Aja", year: 1977, genre: "fusion", label: "ABC", catalog: "AB 1006", country: "USA", confidence: 0.94, notes: "Audiophiler Klassiker, mit Wayne Shorter und Larry Carlton." },
+    { artist: "Fleetwood Mac", title: "Rumours", year: 1977, genre: "classic-rock", label: "Warner Bros.", catalog: "BSK 3010", country: "USA", confidence: 0.97, notes: "Während der Aufnahmen trennten sich beide Paare in der Band." },
+    { artist: "Curtis Mayfield", title: "Roots", year: 1971, genre: "soul", label: "Curtom", catalog: "CRS 8009", country: "USA", confidence: 0.91, notes: "Album zwischen Curtis und Super Fly — unterschätzt." },
+    { artist: "Talk Talk", title: "Spirit of Eden", year: 1988, genre: "post-punk", label: "Parlophone", catalog: "PCSD 105", country: "UK", confidence: 0.89, notes: "Pre-Post-Rock, fast komplett improvisiert eingespielt." },
+    { artist: "Wire", title: "Pink Flag", year: 1977, genre: "punk", label: "Harvest", catalog: "SHSP 4076", country: "UK", confidence: 0.93, notes: "21 Songs in 35 Minuten — Punk-Konzeptionalität pur." },
+    { artist: "Caetano Veloso", title: "Transa", year: 1972, genre: "art-rock", label: "Philips", catalog: "6349 026", country: "BR", confidence: 0.86, notes: "Im Londoner Exil aufgenommen — Tropicália meets Bossa." },
+    { artist: "Funkadelic", title: "Maggot Brain", year: 1971, genre: "funk", label: "Westbound", catalog: "WB 2007", country: "USA", confidence: 0.95, notes: "Eddie Hazels 10-Minuten-Solo am Title-Track ist legendär." },
+    { artist: "Sly & The Family Stone", title: "There's a Riot Goin' On", year: 1971, genre: "funk", label: "Epic", catalog: "KE 30986", country: "USA", confidence: 0.93, notes: "Düstere Antwort auf den Optimismus von Stand!" },
+    { artist: "Suicide", title: "Suicide", year: 1977, genre: "no-wave", label: "Red Star", catalog: "RS 1", country: "USA", confidence: 0.88, notes: "Synth-Punk-Pioniere — Alan Vega Vocals, Martin Rev am Synthi." }
+  ];
+
+  // Demo-Stapel-Pool: 4-6 Platten gleichzeitig erkannt
+  const demoBatchPool = [
+    [
+      { artist: "Frank Zappa", title: "Hot Rats", year: 1969, genre: "fusion", confidence: 0.94 },
+      { artist: "Captain Beefheart", title: "Safe as Milk", year: 1967, genre: "psychedelic", confidence: 0.91 },
+      { artist: "The Velvet Underground", title: "White Light/White Heat", year: 1968, genre: "psychedelic", confidence: 0.88 },
+      { artist: "MC5", title: "Kick Out the Jams", year: 1969, genre: "psychedelic", confidence: 0.86 },
+      { artist: "The Stooges", title: "Fun House", year: 1970, genre: "psychedelic", confidence: 0.92 }
+    ],
+    [
+      { artist: "Bob Marley", title: "Exodus", year: 1977, genre: "reggae", confidence: 0.96 },
+      { artist: "Lee Perry", title: "Super Ape", year: 1976, genre: "dub", confidence: 0.85 },
+      { artist: "Burning Spear", title: "Marcus Garvey", year: 1975, genre: "reggae", confidence: 0.87 },
+      { artist: "King Tubby", title: "Roots of Dub", year: 1975, genre: "dub", confidence: 0.82 }
+    ]
+  ];
+
+  // Matrix-Code Demo-Pool
+  const demoMatrixPool = [
+    { matrix: "SHVL 804 A-2 / B-2", label_hint: "Harvest", album_hint: "Pink Floyd — The Dark Side of the Moon", pressing: "UK Erstpressung, EMI Hayes 1973. A2/B2-Matrix mit Solid Blue Triangle. Sehr begehrt.", confidence: 0.97 },
+    { matrix: "SD 16003 A / B", label_hint: "Atlantic", album_hint: "Chic — Risqué", pressing: "US Originalpressung, Specialty Records Olyphant 1979. 'Big A' Atlantic-Label.", confidence: 0.93 },
+    { matrix: "ILPS 9111 A//1", label_hint: "Island", album_hint: "King Crimson — In the Court of the Crimson King", pressing: "UK Pink-Rim Island Erstpressung 1969 — die seltenste, vierstellige Sammlerpreise.", confidence: 0.95 },
+    { matrix: "6360 011 A//1 1Y", label_hint: "Vertigo", album_hint: "Black Sabbath — Paranoid", pressing: "UK Vertigo Swirl-Label 1970, Phonodisc-Pressung. Heilige Pressung.", confidence: 0.96 }
+  ];
+
+  // Voice Demo-Sätze
+  const demoVoicePool = [
+    "Steely Dan, Aja, Fach vier B",
+    "Joni Mitchell, Court and Spark, neunzehnhundertvierundsiebzig, Regal sieben",
+    "King Crimson, Red, Erstpressung, sehr gut",
+    "Brian Eno, Another Green World, Regal drei C"
+  ];
+
+  // === STORAGE für neu erfasste Platten (in-memory für Demo) ===
+  let captureCounter = 0;
+
+  // === FOTO-ERKENNUNG ===
+  let activePhotoBlob = null;
+
+  function openCapture(mode) {
+    document.getElementById('modal-' + mode).classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    if (mode === 'discogs') {
+      setTimeout(() => document.getElementById('discogs-input').focus(), 100);
+    }
+  }
+
+  function closeCapture(mode) {
+    document.getElementById('modal-' + mode).classList.remove('active');
+    document.body.style.overflow = '';
+
+    if (mode === 'voice' && voiceRecognition && voiceRecognition.state === 'listening') {
+      stopVoiceCapture();
+    }
+    if (mode === 'photo') resetPhotoCapture();
+    if (mode === 'matrix') resetMatrixCapture();
+    if (mode === 'batch') resetBatchCapture();
+  }
+
+  // Click outside to close
+  document.querySelectorAll('.capture-modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        const id = modal.id.replace('modal-', '');
+        closeCapture(id);
+      }
+    });
+  });
+
+  // === FOTO-LOGIK ===
+  function handlePhotoCapture(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    activePhotoBlob = file;
+
+    const url = URL.createObjectURL(file);
+    showPhotoPreview('photo-stage', 'photo-frame', url);
+
+    // Demo-Erkennung mit Verzögerung
+    runPhotoRecognition(file);
+  }
+
+  function showPhotoPreview(stageId, frameId, url) {
+    const stage = document.getElementById(stageId);
+    stage.innerHTML = `<img src="${url}" alt="Aufgenommenes Cover">`;
+
+    // Scanner-Frame neu einbauen
+    const frame = document.createElement('div');
+    frame.className = 'scanner-frame';
+    frame.innerHTML = '<div class="corner-tr"></div><div class="corner-bl"></div>';
+    stage.appendChild(frame);
+
+    const line = document.createElement('div');
+    line.className = 'scanner-line';
+    stage.appendChild(line);
+  }
+
+  function runPhotoRecognition(blob) {
+    const resultBox = document.getElementById('photo-result-box');
+    resultBox.innerHTML = `
+      <div class="recog-status recognizing">
+        <div class="recog-spinner"></div>
+        <div>
+          <strong style="color: var(--rust-dark);">Claude analysiert das Cover…</strong>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--olive); margin-top: 0.2rem;">
+            Demo-Modus · Erkennung dauert 1-2 Sekunden
+          </div>
+        </div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      // Demo: zufällige Platte aus Pool
+      const pick = demoPhotoPool[Math.floor(Math.random() * demoPhotoPool.length)];
+      showPhotoResult(pick);
+    }, 1800);
+  }
+
+  function simulateDemoPhoto() {
+    // Wenn kein Foto aufgenommen, zeige Platzhalter-SVG
+    const stage = document.getElementById('photo-stage');
+    if (!stage.querySelector('img')) {
+      stage.innerHTML = `
+        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #b34a2c, #1a1410); display: flex; align-items: center; justify-content: center; color: var(--cream); font-family: 'Fraunces', serif; font-style: italic; font-size: 1.4rem;">
+          📷 Demo-Cover
+        </div>
+        <div class="scanner-frame">
+          <div class="corner-tr"></div>
+          <div class="corner-bl"></div>
+        </div>
+        <div class="scanner-line"></div>
+      `;
+    }
+    runPhotoRecognition(null);
+  }
+
+  function showPhotoResult(rec) {
+    // Duplicate-Check
+    const dup = records.find(r =>
+      r.artist.toLowerCase() === rec.artist.toLowerCase() &&
+      r.title.toLowerCase() === rec.title.toLowerCase()
+    );
+
+    const resultBox = document.getElementById('photo-result-box');
+    const confidencePct = Math.round(rec.confidence * 100);
+
+    resultBox.innerHTML = `
+      <div class="recog-result">
+        <div class="recog-result-label">Erkannt</div>
+        <div class="recog-result-artist">${rec.artist}</div>
+        <div class="recog-result-title">${rec.title}</div>
+        <div class="recog-result-meta">${rec.year} · ${genreLookup[rec.genre] || rec.genre} · ${rec.label || ''} ${rec.catalog ? '· ' + rec.catalog : ''}</div>
+        <span class="recog-confidence">Konfidenz ${confidencePct}%</span>
+        ${rec.notes ? `<div style="margin-top: 0.7rem; font-style: italic; color: var(--wood); font-size: 0.92rem; line-height: 1.4;">${rec.notes}</div>` : ''}
+        ${dup ? `
+          <div class="duplicate-warn">
+            <strong>Hast du schon!</strong> Steht in <strong>${dup.position}</strong>.
+          </div>
+        ` : `
+          <div class="quick-form">
+            <div class="quick-form-label">Schrank-Position (optional)</div>
+            <input id="photo-position" type="text" placeholder="z. B. R3, Fach C">
+          </div>
+        `}
+      </div>
+      <div class="capture-actions">
+        ${dup ? `
+          <button class="capture-btn capture-btn-secondary" onclick="resetPhotoCapture()">Nächste Platte</button>
+        ` : `
+          <button class="capture-btn capture-btn-primary" onclick="confirmPhotoRecord(${JSON.stringify(rec).replace(/"/g, '&quot;')})">In die Kiste legen</button>
+          <button class="capture-btn capture-btn-secondary" onclick="resetPhotoCapture()">Verwerfen</button>
+        `}
+      </div>
+    `;
+  }
+
+  function confirmPhotoRecord(rec) {
+    const positionInput = document.getElementById('photo-position');
+    const position = positionInput ? positionInput.value.trim() : '';
+
+    addRecordToCollection({
+      artist: rec.artist,
+      title: rec.title,
+      year: rec.year,
+      genre: rec.genre,
+      label: rec.label || '',
+      catalog: rec.catalog || '',
+      country: rec.country || 'UK',
+      condition: 'NM',
+      position: position || 'Neu erfasst',
+      note: rec.notes || `Erfasst per Foto-Erkennung am ${new Date().toLocaleDateString('de-DE')}`,
+      colors: pickColors(),
+      firstPress: false
+    });
+
+    document.getElementById('photo-result-box').innerHTML = `
+      <div class="recog-status success">
+        <span style="font-size: 1.4rem;">✓</span>
+        <div>
+          <strong>${rec.artist} — ${rec.title}</strong> wurde in die Kiste gelegt!
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--olive); margin-top: 0.2rem;">
+            Sammlung: ${records.length} Platten
+          </div>
+        </div>
+      </div>
+      <div class="capture-actions">
+        <button class="capture-btn capture-btn-primary" onclick="resetPhotoCapture()">Nächste Platte</button>
+        <button class="capture-btn capture-btn-secondary" onclick="closeCapture('photo')">Fertig</button>
+      </div>
+    `;
+  }
+
+  function resetPhotoCapture() {
+    document.getElementById('photo-stage').innerHTML = `
+      <div class="photo-empty">
+        <div class="photo-empty-icon">🎵</div>
+        <div class="photo-empty-text">Plattenhülle vor die Kamera halten</div>
+      </div>
+    `;
+    document.getElementById('photo-result-box').innerHTML = '';
+    document.getElementById('photo-input').value = '';
+    activePhotoBlob = null;
+  }
+
+  // === STAPEL-MODUS ===
+  let batchResults = [];
+
+  function handleBatchCapture(event) {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
+
+    // Thumbnails anzeigen
+    const gallery = document.getElementById('batch-gallery');
+    files.forEach(file => {
+      const url = URL.createObjectURL(file);
+      const thumb = document.createElement('div');
+      thumb.className = 'batch-thumb';
+      thumb.innerHTML = `<img src="${url}">`;
+      gallery.appendChild(thumb);
+    });
+
+    runBatchRecognition(files.length);
+  }
+
+  function simulateDemoBatch() {
+    const pick = demoBatchPool[Math.floor(Math.random() * demoBatchPool.length)];
+
+    const gallery = document.getElementById('batch-gallery');
+    pick.forEach((rec, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'batch-thumb';
+      const colors = pickColors();
+      thumb.innerHTML = `
+        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, ${colors[1]}, ${colors[0]}); display: flex; align-items: center; justify-content: center; color: ${colors[1]}; font-family: 'Fraunces', serif; font-style: italic; font-size: 0.7rem; padding: 0.3rem; text-align: center;">
+          ${rec.artist.split(' ').map(w => w[0]).join('').slice(0,2)}
+        </div>
+      `;
+      gallery.appendChild(thumb);
+    });
+
+    runBatchRecognitionWithResults(pick);
+  }
+
+  function runBatchRecognition(fileCount) {
+    document.getElementById('batch-status-box').innerHTML = `
+      <div class="recog-status recognizing">
+        <div class="recog-spinner"></div>
+        <div>
+          <strong style="color: var(--rust-dark);">Claude analysiert ${fileCount} Cover…</strong>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--olive); margin-top: 0.2rem;">
+            Demo-Modus · ca. 2-3 Sekunden
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('batch-list').innerHTML = '';
+
+    setTimeout(() => {
+      const pick = demoBatchPool[Math.floor(Math.random() * demoBatchPool.length)];
+      runBatchRecognitionWithResults(pick.slice(0, fileCount));
+    }, 2200);
+  }
+
+  function runBatchRecognitionWithResults(results) {
+    document.getElementById('batch-status-box').innerHTML = '';
+    const list = document.getElementById('batch-list');
+    list.innerHTML = '';
+    batchResults = [];
+
+    let okCount = 0, dupCount = 0;
+
+    results.forEach((rec, idx) => {
+      setTimeout(() => {
+        const dup = records.find(r =>
+          r.artist.toLowerCase() === rec.artist.toLowerCase() &&
+          r.title.toLowerCase() === rec.title.toLowerCase()
+        );
+
+        const item = document.createElement('div');
+        item.className = 'batch-item';
+        const status = dup ? 'dup' : 'ok';
+        const statusText = dup ? 'Hast du' : 'Neu';
+
+        item.innerHTML = `
+          <span class="batch-item-status ${status}">${statusText}</span>
+          <span class="batch-item-text">
+            <strong>${rec.artist}</strong> — ${rec.title}
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--olive); margin-left: 0.5rem;">${rec.year} · ${Math.round(rec.confidence * 100)}%</span>
+          </span>
+        `;
+        list.appendChild(item);
+
+        // Update Thumb-Badge
+        const thumbs = document.querySelectorAll('#batch-gallery .batch-thumb');
+        if (thumbs[idx]) {
+          const badge = document.createElement('span');
+          badge.className = 'batch-thumb-badge ' + (dup ? 'dup' : '');
+          badge.textContent = dup ? '!' : '✓';
+          thumbs[idx].appendChild(badge);
+        }
+
+        if (dup) dupCount++;
+        else {
+          okCount++;
+          batchResults.push(rec);
+        }
+
+        // Letzter Eintrag → Summary
+        if (idx === results.length - 1) {
+          showBatchSummary(okCount, dupCount, results.length);
+        }
+      }, idx * 220);
+    });
+  }
+
+  function showBatchSummary(okCount, dupCount, total) {
+    document.getElementById('batch-summary-box').innerHTML = `
+      <div class="batch-summary">
+        <strong>${total} Cover analysiert.</strong> ${okCount} neu · ${dupCount} bereits in der Sammlung.
+      </div>
+      ${okCount > 0 ? `
+        <div class="capture-actions" style="margin-top: 1rem;">
+          <button class="capture-btn capture-btn-primary" onclick="confirmBatchSave()">${okCount} neue Platten in die Kiste legen</button>
+          <button class="capture-btn capture-btn-secondary" onclick="resetBatchCapture()">Verwerfen</button>
+        </div>
+      ` : `
+        <div class="capture-actions" style="margin-top: 1rem;">
+          <button class="capture-btn capture-btn-secondary" onclick="resetBatchCapture()">Nächster Stapel</button>
+        </div>
+      `}
+    `;
+  }
+
+  function confirmBatchSave() {
+    batchResults.forEach(rec => {
+      addRecordToCollection({
+        artist: rec.artist,
+        title: rec.title,
+        year: rec.year,
+        genre: rec.genre,
+        label: '',
+        catalog: '',
+        country: 'UK',
+        condition: 'VG+',
+        position: 'Stapel-Erfassung',
+        note: `Erfasst per Stapel-Foto am ${new Date().toLocaleDateString('de-DE')}`,
+        colors: pickColors(),
+        firstPress: false
+      });
+    });
+
+    const count = batchResults.length;
+    document.getElementById('batch-summary-box').innerHTML = `
+      <div class="recog-status success">
+        <span style="font-size: 1.4rem;">✓</span>
+        <div>
+          <strong>${count} Platten in die Kiste gelegt!</strong>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--olive); margin-top: 0.2rem;">
+            Sammlung: ${records.length} Platten
+          </div>
+        </div>
+      </div>
+      <div class="capture-actions" style="margin-top: 1rem;">
+        <button class="capture-btn capture-btn-primary" onclick="resetBatchCapture()">Nächster Stapel</button>
+        <button class="capture-btn capture-btn-secondary" onclick="closeCapture('batch')">Fertig</button>
+      </div>
+    `;
+  }
+
+  function resetBatchCapture() {
+    document.getElementById('batch-gallery').innerHTML = '';
+    document.getElementById('batch-status-box').innerHTML = '';
+    document.getElementById('batch-summary-box').innerHTML = '';
+    document.getElementById('batch-list').innerHTML = `<div class="batch-empty">Noch keine Platten erkannt — oben „Stapel fotografieren" tippen</div>`;
+    document.getElementById('batch-input').value = '';
+    batchResults = [];
+  }
+
+  // === MATRIX-CODE ===
+  function handleMatrixCapture(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    showPhotoPreview('matrix-stage', 'matrix-frame', url);
+    runMatrixRecognition();
+  }
+
+  function simulateDemoMatrix() {
+    const stage = document.getElementById('matrix-stage');
+    if (!stage.querySelector('img')) {
+      stage.innerHTML = `
+        <div style="width: 100%; height: 100%; background: radial-gradient(circle, #1a1410 30%, #2a1810 60%, #0a0604 100%); display: flex; align-items: center; justify-content: center; color: var(--mustard); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; letter-spacing: 0.2em;">
+          RUNOUT-DETAIL
+        </div>
+        <div class="scanner-frame">
+          <div class="corner-tr"></div>
+          <div class="corner-bl"></div>
+        </div>
+        <div class="scanner-line"></div>
+      `;
+    }
+    runMatrixRecognition();
+  }
+
+  function runMatrixRecognition() {
+    const resultBox = document.getElementById('matrix-result-box');
+    resultBox.innerHTML = `
+      <div class="recog-status recognizing">
+        <div class="recog-spinner"></div>
+        <div>
+          <strong style="color: var(--rust-dark);">Claude liest den Matrix-Code…</strong>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--olive); margin-top: 0.2rem;">
+            Erkenne Pressing-Plant und Erstpressungs-Merkmale
+          </div>
+        </div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      const pick = demoMatrixPool[Math.floor(Math.random() * demoMatrixPool.length)];
+      showMatrixResult(pick);
+    }, 2000);
+  }
+
+  function showMatrixResult(rec) {
+    const confidencePct = Math.round(rec.confidence * 100);
+    document.getElementById('matrix-result-box').innerHTML = `
+      <div class="recog-result">
+        <div class="recog-result-label">Pressing identifiziert</div>
+        <div class="recog-result-artist">Matrix-Code</div>
+        <div class="recog-result-title" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; letter-spacing: 0.05em; word-break: break-all;">${rec.matrix}</div>
+        <div class="recog-result-meta" style="margin-top: 0.7rem;"><strong>${rec.album_hint}</strong></div>
+        <div class="recog-result-meta">Label: ${rec.label_hint}</div>
+        <span class="recog-confidence">Konfidenz ${confidencePct}%</span>
+        <div class="duplicate-warn" style="border-left-color: var(--olive); background: rgba(107, 98, 51, 0.08);">
+          <strong style="color: var(--olive);">Pressing-Details:</strong> ${rec.pressing}
+        </div>
+      </div>
+      <div class="capture-actions">
+        <button class="capture-btn capture-btn-primary" onclick="resetMatrixCapture()">Nächste Platte</button>
+        <button class="capture-btn capture-btn-secondary" onclick="closeCapture('matrix')">Fertig</button>
+      </div>
+    `;
+  }
+
+  function resetMatrixCapture() {
+    document.getElementById('matrix-stage').innerHTML = `
+      <div class="photo-empty">
+        <div class="photo-empty-icon">🔍</div>
+        <div class="photo-empty-text">Auslauf-Rille zur Kamera halten</div>
+      </div>
+    `;
+    document.getElementById('matrix-result-box').innerHTML = '';
+    document.getElementById('matrix-input').value = '';
+  }
+
+  // === SPRACHSTEUERUNG ===
+  let voiceRecognition = null;
+  let voiceTranscript = '';
+
+  function initVoiceRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return null;
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'de-DE';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let final = '';
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) final += t + ' ';
+        else interim += t;
+      }
+      if (final) voiceTranscript += final;
+      document.getElementById('mic-transcript').textContent = voiceTranscript + interim;
+    };
+
+    recognition.onstart = () => {
+      recognition.state = 'listening';
+      document.getElementById('mic-button').classList.add('listening');
+      document.getElementById('mic-status').textContent = '🔴 Hört zu…';
+    };
+
+    recognition.onend = () => {
+      recognition.state = 'idle';
+      document.getElementById('mic-button').classList.remove('listening');
+      document.getElementById('mic-status').textContent = 'Aufnahme beendet — wird verarbeitet…';
+      if (voiceTranscript.trim()) {
+        setTimeout(() => parseVoiceCommand(voiceTranscript.trim()), 600);
+      } else {
+        document.getElementById('mic-status').textContent = 'Nichts verstanden — nochmal probieren?';
+      }
+    };
+
+    recognition.onerror = (event) => {
+      document.getElementById('mic-status').textContent = `Fehler: ${event.error}`;
+      document.getElementById('mic-button').classList.remove('listening');
+    };
+
+    return recognition;
+  }
+
+  function toggleVoiceCapture() {
+    if (!voiceRecognition) {
+      voiceRecognition = initVoiceRecognition();
+      if (!voiceRecognition) {
+        document.getElementById('mic-status').textContent = 'Spracherkennung nicht verfügbar — Demo-Modus probieren';
+        return;
+      }
+    }
+    if (voiceRecognition.state === 'listening') {
+      stopVoiceCapture();
+    } else {
+      startVoiceCapture();
+    }
+  }
+
+  function startVoiceCapture() {
+    voiceTranscript = '';
+    document.getElementById('mic-transcript').textContent = '';
+    document.getElementById('voice-result-box').innerHTML = '';
+    try { voiceRecognition.start(); } catch (e) {}
+  }
+
+  function stopVoiceCapture() {
+    try { voiceRecognition.stop(); } catch (e) {}
+  }
+
+  function simulateDemoVoice() {
+    const sentence = demoVoicePool[Math.floor(Math.random() * demoVoicePool.length)];
+    document.getElementById('mic-transcript').textContent = sentence;
+    document.getElementById('mic-status').textContent = '✨ Demo-Eingabe — verarbeite…';
+    setTimeout(() => parseVoiceCommand(sentence), 1000);
+  }
+
+  // Einfache Voice-Parsing-Heuristik
+  function parseVoiceCommand(text) {
+    const lower = text.toLowerCase();
+
+    // Versuche, gegen bekannte Künstler zu matchen
+    let matched = null;
+    const allArtists = [...new Set(records.map(r => r.artist))];
+
+    for (const artist of allArtists) {
+      if (lower.includes(artist.toLowerCase())) {
+        // Finde passendes Album
+        const candidates = records.filter(r => r.artist === artist);
+        for (const cand of candidates) {
+          if (lower.includes(cand.title.toLowerCase().slice(0, Math.min(8, cand.title.length)))) {
+            matched = { ...cand, fromCollection: true };
+            break;
+          }
+        }
+        if (!matched && candidates.length) {
+          matched = { ...candidates[0], fromCollection: true, partialMatch: true };
+        }
+        if (matched) break;
+      }
+    }
+
+    // Demo: extrahiere Position aus Text
+    let position = '';
+    const posMatch = text.match(/(?:fach|regal)\s*([\w\d]+(?:\s*[\w\d]+)?)/i);
+    if (posMatch) position = posMatch[0];
+
+    if (matched) {
+      const dup = matched.fromCollection;
+      document.getElementById('voice-result-box').innerHTML = `
+        <div class="recog-result" style="margin-top: 1rem;">
+          <div class="recog-result-label">Verstanden</div>
+          <div class="recog-result-artist">${matched.artist}</div>
+          <div class="recog-result-title">${matched.title}</div>
+          <div class="recog-result-meta">${matched.year} · ${genreLookup[matched.genre] || matched.genre}</div>
+          ${position ? `<div style="margin-top: 0.5rem; color: var(--wood);"><strong>Position:</strong> ${position}</div>` : ''}
+          ${dup ? `
+            <div class="duplicate-warn">
+              <strong>Hast du schon!</strong> Steht in <strong>${matched.position}</strong>.
+            </div>
+          ` : ''}
+        </div>
+        <div class="capture-actions" style="margin-top: 1rem;">
+          ${dup ? `
+            <button class="capture-btn capture-btn-secondary" onclick="resetVoiceCapture()">Nächste Platte</button>
+          ` : `
+            <button class="capture-btn capture-btn-primary" onclick="confirmVoiceRecord()">In die Kiste legen</button>
+            <button class="capture-btn capture-btn-secondary" onclick="resetVoiceCapture()">Nochmal</button>
+          `}
+        </div>
+      `;
+      window._lastVoiceMatch = { ...matched, position };
+      document.getElementById('mic-status').textContent = '✓ Erkannt';
+    } else {
+      // Erfindung aus dem Pool
+      const pick = demoPhotoPool[Math.floor(Math.random() * demoPhotoPool.length)];
+      document.getElementById('voice-result-box').innerHTML = `
+        <div class="recog-result" style="margin-top: 1rem;">
+          <div class="recog-result-label">Verstanden</div>
+          <div class="recog-result-artist">${pick.artist}</div>
+          <div class="recog-result-title">${pick.title}</div>
+          <div class="recog-result-meta">${pick.year} · ${genreLookup[pick.genre] || pick.genre}</div>
+          ${position ? `<div style="margin-top: 0.5rem; color: var(--wood);"><strong>Position:</strong> ${position}</div>` : ''}
+        </div>
+        <div class="capture-actions" style="margin-top: 1rem;">
+          <button class="capture-btn capture-btn-primary" onclick="confirmVoiceRecord()">In die Kiste legen</button>
+          <button class="capture-btn capture-btn-secondary" onclick="resetVoiceCapture()">Nochmal</button>
+        </div>
+      `;
+      window._lastVoiceMatch = { ...pick, position };
+      document.getElementById('mic-status').textContent = '✓ Erkannt';
+    }
+  }
+
+  function confirmVoiceRecord() {
+    const m = window._lastVoiceMatch;
+    if (!m) return;
+    addRecordToCollection({
+      artist: m.artist,
+      title: m.title,
+      year: m.year,
+      genre: m.genre,
+      label: m.label || '',
+      catalog: m.catalog || '',
+      country: m.country || 'UK',
+      condition: 'VG+',
+      position: m.position || 'Per Sprache erfasst',
+      note: `Per Diktat erfasst am ${new Date().toLocaleDateString('de-DE')}`,
+      colors: pickColors(),
+      firstPress: false
+    });
+
+    document.getElementById('voice-result-box').innerHTML = `
+      <div class="recog-status success" style="margin-top: 1rem;">
+        <span style="font-size: 1.4rem;">✓</span>
+        <div>
+          <strong>${m.artist} — ${m.title}</strong> in der Kiste!
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--olive); margin-top: 0.2rem;">
+            Sammlung: ${records.length} Platten
+          </div>
+        </div>
+      </div>
+      <div class="capture-actions" style="margin-top: 1rem;">
+        <button class="capture-btn capture-btn-primary" onclick="resetVoiceCapture()">Nächste Platte</button>
+        <button class="capture-btn capture-btn-secondary" onclick="closeCapture('voice')">Fertig</button>
+      </div>
+    `;
+  }
+
+  function resetVoiceCapture() {
+    voiceTranscript = '';
+    document.getElementById('mic-transcript').textContent = '';
+    document.getElementById('mic-status').textContent = 'Tippe auf das Mikro und sprich';
+    document.getElementById('voice-result-box').innerHTML = '';
+    window._lastVoiceMatch = null;
+  }
+
+  // === DISCOGS-SUCHE ===
+  let discogsSearchTimer = null;
+
+  document.getElementById('discogs-input').addEventListener('input', (e) => {
+    const q = e.target.value.trim();
+    clearTimeout(discogsSearchTimer);
+    if (q.length < 3) {
+      document.getElementById('discogs-results').innerHTML = `<div class="discogs-empty">Mindestens 3 Buchstaben…</div>`;
+      return;
+    }
+    discogsSearchTimer = setTimeout(() => searchDiscogs(q), 350);
+  });
+
+  function searchDiscogs(query) {
+    document.getElementById('discogs-results').innerHTML = `
+      <div class="discogs-empty">
+        <div class="recog-spinner" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></div>
+        Suche bei Discogs…
+      </div>
+    `;
+
+    // Discogs-API ist öffentlich, aber CORS blockiert leider direkten Zugriff aus Browser
+    // ohne Token. Wir nutzen iTunes als sichtbare Variante (gleiche Idee, kein Token nötig)
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=10`;
+    const callbackName = `discogsSearchCb_${Date.now()}`;
+    const jsonpUrl = url + '&callback=' + callbackName;
+
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      script.remove();
+      renderDiscogsResults(data?.results || []);
+    };
+
+    const script = document.createElement('script');
+    script.src = jsonpUrl;
+    script.onerror = () => {
+      delete window[callbackName];
+      script.remove();
+      document.getElementById('discogs-results').innerHTML = `<div class="discogs-empty">Suche fehlgeschlagen — Internet?</div>`;
+    };
+    document.head.appendChild(script);
+
+    // Timeout-Fallback
+    setTimeout(() => {
+      if (window[callbackName]) {
+        delete window[callbackName];
+        script.remove();
+        document.getElementById('discogs-results').innerHTML = `<div class="discogs-empty">Suche zu langsam — nochmal probieren?</div>`;
+      }
+    }, 6000);
+  }
+
+  function renderDiscogsResults(results) {
+    const wrap = document.getElementById('discogs-results');
+    if (!results.length) {
+      wrap.innerHTML = `<div class="discogs-empty">Nichts gefunden — anderen Suchbegriff probieren?</div>`;
+      return;
+    }
+    wrap.innerHTML = results.map((r, idx) => {
+      const cover = (r.artworkUrl100 || '').replace('100x100', '200x200');
+      const year = r.releaseDate ? new Date(r.releaseDate).getFullYear() : '';
+      return `
+        <div class="discogs-result-item" onclick="selectDiscogsResult(${idx})">
+          <div class="discogs-result-thumb">${cover ? `<img src="${cover}" alt="">` : ''}</div>
+          <div class="discogs-result-info">
+            <div class="discogs-result-artist">${escapeHtml(r.artistName || '')}</div>
+            <div class="discogs-result-title">${escapeHtml(r.collectionName || '')}</div>
+            <div class="discogs-result-meta">${year} ${r.primaryGenreName ? '· ' + escapeHtml(r.primaryGenreName) : ''} ${r.trackCount ? '· ' + r.trackCount + ' Tracks' : ''}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    window._discogsResults = results;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function selectDiscogsResult(idx) {
+    const r = window._discogsResults[idx];
+    if (!r) return;
+    const year = r.releaseDate ? new Date(r.releaseDate).getFullYear() : null;
+    const cover = (r.artworkUrl100 || '').replace('100x100', '600x600');
+
+    // Genre-Mapping
+    const genreMap = {
+      'Rock': 'classic-rock', 'Pop': 'classic-rock', 'Jazz': 'modal-jazz',
+      'Soul': 'soul', 'Funk': 'funk', 'Reggae': 'reggae', 'Blues': 'chicago-blues',
+      'Punk': 'punk', 'Alternative': 'post-punk', 'Folk': 'folk-rock',
+      'Electronic': 'synth-pop', 'Country': 'country-rock'
+    };
+    const guessedGenre = genreMap[r.primaryGenreName] || 'classic-rock';
+
+    // Duplicate-Check
+    const dup = records.find(rec =>
+      rec.artist.toLowerCase() === (r.artistName || '').toLowerCase() &&
+      rec.title.toLowerCase() === (r.collectionName || '').toLowerCase()
+    );
+
+    document.getElementById('discogs-result-box').innerHTML = `
+      <div class="recog-result" style="margin-top: 1rem;">
+        <div class="recog-result-label">Discogs/iTunes-Eintrag</div>
+        <div class="recog-result-artist">${escapeHtml(r.artistName || '')}</div>
+        <div class="recog-result-title">${escapeHtml(r.collectionName || '')}</div>
+        <div class="recog-result-meta">${year || '?'} · ${genreLookup[guessedGenre] || guessedGenre}</div>
+        ${dup ? `
+          <div class="duplicate-warn">
+            <strong>Hast du schon!</strong> Steht in <strong>${dup.position}</strong>.
+          </div>
+        ` : `
+          <div class="quick-form">
+            <div class="quick-form-label">Schrank-Position (optional)</div>
+            <input id="discogs-position" type="text" placeholder="z. B. R3, Fach C">
+          </div>
+        `}
+      </div>
+      <div class="capture-actions" style="margin-top: 1rem;">
+        ${dup ? `
+          <button class="capture-btn capture-btn-secondary" onclick="document.getElementById('discogs-result-box').innerHTML=''">Schließen</button>
+        ` : `
+          <button class="capture-btn capture-btn-primary" onclick="confirmDiscogsRecord(${idx}, '${guessedGenre}')">In die Kiste legen</button>
+          <button class="capture-btn capture-btn-secondary" onclick="document.getElementById('discogs-result-box').innerHTML=''">Verwerfen</button>
+        `}
+      </div>
+    `;
+  }
+
+  function confirmDiscogsRecord(idx, genre) {
+    const r = window._discogsResults[idx];
+    const positionInput = document.getElementById('discogs-position');
+    const position = positionInput ? positionInput.value.trim() : '';
+    const year = r.releaseDate ? new Date(r.releaseDate).getFullYear() : new Date().getFullYear();
+    const cover = (r.artworkUrl100 || '').replace('100x100', '600x600');
+
+    addRecordToCollection({
+      artist: r.artistName || 'Unbekannt',
+      title: r.collectionName || 'Unbekannt',
+      year: year,
+      genre: genre,
+      label: '',
+      catalog: '',
+      country: r.country || 'UK',
+      condition: 'VG+',
+      position: position || 'Discogs-Erfassung',
+      note: `Erfasst per Discogs-Suche am ${new Date().toLocaleDateString('de-DE')}`,
+      colors: pickColors(),
+      firstPress: false,
+      manualCover: cover
+    });
+
+    document.getElementById('discogs-result-box').innerHTML = `
+      <div class="recog-status success" style="margin-top: 1rem;">
+        <span style="font-size: 1.4rem;">✓</span>
+        <div>
+          <strong>${r.artistName} — ${r.collectionName}</strong> in der Kiste!
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--olive); margin-top: 0.2rem;">
+            Sammlung: ${records.length} Platten
+          </div>
+        </div>
+      </div>
+      <div class="capture-actions" style="margin-top: 1rem;">
+        <button class="capture-btn capture-btn-primary" onclick="resetDiscogsSearch()">Nächste Suche</button>
+        <button class="capture-btn capture-btn-secondary" onclick="closeCapture('discogs')">Fertig</button>
+      </div>
+    `;
+  }
+
+  // === MANUELLER FORM ===
+  function toggleManualForm() {
+    const wrap = document.getElementById('manualFormWrap');
+    wrap.classList.toggle('show');
+    if (wrap.classList.contains('show')) {
+      setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+  }
+
+  function saveManualRecord() {
+    const artist = document.getElementById('m_artist').value.trim();
+    const title = document.getElementById('m_title').value.trim();
+    if (!artist || !title) {
+      alert('Künstler und Titel sind Pflicht.');
+      return;
+    }
+    addRecordToCollection({
+      artist,
+      title,
+      year: parseInt(document.getElementById('m_year').value) || new Date().getFullYear(),
+      genre: document.getElementById('addGenreSelect').value || 'classic-rock',
+      label: document.getElementById('m_label').value.trim(),
+      catalog: '',
+      country: document.getElementById('m_country').value.trim() || 'UK',
+      condition: document.getElementById('m_condition').value.split(' ')[0],
+      position: document.getElementById('m_position').value.trim() || 'Neu erfasst',
+      note: document.getElementById('m_note').value.trim() || `Manuell erfasst am ${new Date().toLocaleDateString('de-DE')}`,
+      colors: pickColors(),
+      firstPress: false,
+      insider: {
+        matrix: document.getElementById('m_matrix').value.trim(),
+        plant: document.getElementById('m_plant').value.trim()
+      }
+    });
+
+    // Reset form
+    ['m_artist','m_title','m_year','m_label','m_matrix','m_plant','m_position','m_country','m_note'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+
+    alert(`✓ "${artist} — ${title}" liegt jetzt in der Kiste! (${records.length} Platten gesamt)`);
+    toggleManualForm();
+  }
+
+  // === GEMEINSAME HELFER ===
+  function addRecordToCollection(rec) {
+    records.unshift(rec); // Vorne anhängen, damit "neueste zuerst" sichtbar
+    captureCounter++;
+
+    // Re-render
+    renderGrid('recordsGrid', records);
+    renderGrid('collectionGrid', records);
+    document.getElementById('resultCount').textContent = `${records.length} Treffer`;
+    // Stats updaten
+    document.querySelectorAll('.stat-card').forEach(card => {
+      const v = card.querySelector('.stat-value');
+      const l = card.querySelector('.stat-label')?.textContent || '';
+      if (l.includes('gesamt')) v.textContent = (2047 + captureCounter).toLocaleString('de-DE');
+    });
+    // Hero stat
+    const heroStat = document.querySelector('.hero-stat-num');
+    if (heroStat) heroStat.textContent = (2047 + captureCounter).toLocaleString('de-DE');
+  }
+
+  function resetDiscogsSearch() {
+    document.getElementById('discogs-input').value = '';
+    document.getElementById('discogs-input').focus();
+    document.getElementById('discogs-results').innerHTML = '<div class="discogs-empty">Tippe oben einen Suchbegriff ein</div>';
+    document.getElementById('discogs-result-box').innerHTML = '';
+  }
+
+  function pickColors() {
+    const palettes = [
+      ["#1a1410","#b34a2c"], ["#3d2817","#d4a23a"], ["#0d3b66","#f4d35e"],
+      ["#5a3a22","#f4ead5"], ["#2c1810","#e8dcc0"], ["#b34a2c","#f4d35e"],
+      ["#4a4e4d","#e8dcc0"], ["#0d3b66","#d4a23a"], ["#6b6233","#f4ead5"]
+    ];
+    return palettes[Math.floor(Math.random() * palettes.length)];
   }
 
   // === INIT ===
